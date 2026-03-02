@@ -132,7 +132,9 @@ int main(void)
 {
     obf_init();
 
-    puts("== VORTEX Obfuscation Framework - demonstration ==\n");
+    OBF_WITH(banner, "== VORTEX Obfuscation Framework - demonstration ==") {
+        printf("%s\n\n", banner);
+    }
 
     demo_string_single(); puts("");
     demo_string_scoped(); puts("");
