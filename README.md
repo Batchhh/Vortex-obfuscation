@@ -1,8 +1,8 @@
-# VORTEX
+# Vortex - Obfuscation framework
 
-[![CI](https://github.com/Batchhh/VORTEX/actions/workflows/ci.yml/badge.svg)](https://github.com/Batchhh/VORTEX/actions/workflows/ci.yml)
-[![Release](https://github.com/Batchhh/VORTEX/actions/workflows/release.yml/badge.svg)](https://github.com/Batchhh/VORTEX/actions/workflows/release.yml)
-[![Latest release](https://img.shields.io/github/v/release/Batchhh/VORTEX)](https://github.com/Batchhh/VORTEX/releases/latest)
+[![CI](https://github.com/Batchhh/Vortex-obfuscation/actions/workflows/ci.yml/badge.svg)](https://github.com/Batchhh/Vortex-obfuscation/actions/workflows/ci.yml)
+[![Release](https://github.com/Batchhh/Vortex-obfuscation/actions/workflows/release.yml/badge.svg)](https://github.com/Batchhh/Vortex-obfuscation/actions/workflows/release.yml)
+[![Latest release](https://img.shields.io/github/v/release/Batchhh/Vortex-obfuscation)](https://github.com/Batchhh/Vortex-obfuscation/releases/latest)
 
 A C11 library that encrypts strings and numeric constants **at compile time**, making them invisible to binary analysis tools like `strings`, IDA Pro, and Ghidra.
 
