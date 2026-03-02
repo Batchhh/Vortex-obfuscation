@@ -1,0 +1,36 @@
+name: Feature request
+description: Propose a new macro, API, or change to the cipher
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve?
+      description: Describe the use case or limitation that motivates the request.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: |
+        What would the new API / macro / behaviour look like?
+        A rough code sketch is welcome.
+      render: c
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Any workarounds you already tried, or other approaches you ruled out.
+
+  - type: checkboxes
+    id: constraints
+    attributes:
+      label: Constraints that must be respected
+      options:
+        - label: No external dependencies
+        - label: Stack-only allocation (no heap)
+        - label: C11 compatibility
+        - label: Must compile cleanly under OBF_DISABLE

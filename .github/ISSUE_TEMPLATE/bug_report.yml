@@ -1,0 +1,63 @@
+name: Bug report
+description: Something is broken or behaving unexpectedly
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Before filing, please check that you can reproduce the issue on the latest release.
+
+  - type: input
+    id: version
+    attributes:
+      label: VORTEX version
+      description: Output of `obf_version()` or the release tag you downloaded.
+      placeholder: "e.g. VORTEX/1.0.0"
+    validations:
+      required: true
+
+  - type: input
+    id: compiler
+    attributes:
+      label: Compiler & version
+      placeholder: "e.g. gcc 13.2, clang 17, MSVC 19.38"
+    validations:
+      required: true
+
+  - type: input
+    id: os
+    attributes:
+      label: OS / architecture
+      placeholder: "e.g. Ubuntu 24.04 x86_64, macOS 14 arm64, Windows 11 x64"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: A clear description of the bug and what you expected instead.
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: Minimal reproduction
+      description: The smallest snippet of C code that triggers the bug.
+      render: c
+    validations:
+      required: true
+
+  - type: textarea
+    id: build_flags
+    attributes:
+      label: Build flags / Makefile invocation
+      placeholder: "e.g. make CC=clang CFLAGS=-fsanitize=address"
+      render: shell
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: Anything else?
+      description: Logs, disassembly output, binary analysis screenshots, etc.

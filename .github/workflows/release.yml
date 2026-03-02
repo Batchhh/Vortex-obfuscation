@@ -1,0 +1,72 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            artifact: libvortex-linux-x86_64
+            cc: gcc
+          - os: macos-latest
+            artifact: libvortex-macos-arm64
+            cc: clang
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build library
+        run: make lib CC=${{ matrix.cc }}
+
+      - name: Package release archive
+        run: |
+          ARCHIVE="${{ matrix.artifact }}"
+          mkdir -p "$ARCHIVE/lib" "$ARCHIVE/include/vortex"
+
+          # Library
+          cp build/libvortex.a "$ARCHIVE/lib/"
+
+          # Public headers — everything a user needs
+          cp include/obfuscate.h  "$ARCHIVE/include/"
+          cp include/obf_ffi.h    "$ARCHIVE/include/"
+          cp include/vortex/*.h   "$ARCHIVE/include/vortex/"
+
+          # License
+          cp LICENSE "$ARCHIVE/"
+
+          tar -czf "${ARCHIVE}.tar.gz" "$ARCHIVE"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: ${{ matrix.artifact }}.tar.gz
+
+  release:
+    name: Create GitHub Release
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Publish release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*.tar.gz
+          generate_release_notes: true

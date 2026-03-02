@@ -1,0 +1,4 @@
+build/
+example
+compile_commands.json
+.cache

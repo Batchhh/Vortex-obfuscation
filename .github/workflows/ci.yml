@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    name: Build & smoke-test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            cc: gcc
+          - os: macos-latest
+            cc: clang
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build all (lib + example)
+        run: make CC=${{ matrix.cc }}
+
+      - name: Run example
+        run: ./example
+
+      - name: Verify no plaintext strings leak into binary (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          if strings example | grep -Ei "hello|vortex|secret|bearer"; then
+            echo "FAIL: plaintext strings found in binary"
+            exit 1
+          fi
+          echo "OK: no plaintext strings found"
+
+      - name: Verify no plaintext strings leak into binary (macOS)
+        if: matrix.os == 'macos-latest'
+        run: |
+          if strings example | grep -Ei "hello|vortex|secret|bearer"; then
+            echo "FAIL: plaintext strings found in binary"
+            exit 1
+          fi
+          echo "OK: no plaintext strings found"
+
+      - name: Debug build (OBF_DISABLE)
+        run: make debug CC=${{ matrix.cc }}
