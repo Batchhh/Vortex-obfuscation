@@ -192,29 +192,28 @@
  *   Loop 3  — performs the actual decryption into the buffer and binds
  *             var; its UPDATE clears the flag so loops 1 and 2 also exit.
  *
- * The encrypted blob is an inline compound literal in read-only storage.
+ * The encrypted blob is a static const array in read-only storage.
  * The plaintext buffer lives only while the body executes.
  *
  * Lifetime note: do NOT use var outside the braces.                    */
 #define OBF_WITH(var, s)                                                             \
+    (void)sizeof(struct {                                                             \
+        _Static_assert(sizeof(s) <= (size_t)(OBF_MAX_LEN),                           \
+                       "OBF_WITH: string length exceeds OBF_MAX_LEN");               \
+        char obf_sa_;                                                                 \
+    });                                                                               \
+    static const unsigned char var##__blob_[] = {                                    \
+        OBF_SBOX(OBF_SEED0), OBF_SBOX(OBF_SEED1),                                   \
+        OBF_SBOX(OBF_SEED2), OBF_SBOX(OBF_SEED3),                                   \
+        OBF_ENC_ALL(s)                                                               \
+    };                                                                               \
     for (int var##__once_ = 1; var##__once_; var##__once_ = 0)                      \
     for (unsigned char var##__buf_[OBF_MAX_LEN] = {0};                               \
          var##__once_;                                                                \
          obf_zero(var##__buf_, (size_t)OBF_MAX_LEN), var##__once_ = 0)              \
-    for (const char *var = (                                                          \
-             (void)sizeof(struct {                                                    \
-                 _Static_assert(sizeof(s) <= (size_t)(OBF_MAX_LEN),                  \
-                                "OBF_WITH: string length exceeds OBF_MAX_LEN");       \
-                 char obf_sa_;                                                        \
-             }),                                                                      \
-             obf_decrypt(                                                             \
-                 (const unsigned char[]){                                             \
-                     OBF_SBOX(OBF_SEED0), OBF_SBOX(OBF_SEED1),                      \
-                     OBF_SBOX(OBF_SEED2), OBF_SBOX(OBF_SEED3),                      \
-                     OBF_ENC_ALL(s)                                                  \
-                 },                                                                   \
-                 (size_t)(sizeof(s) + 4u), var##__buf_)                              \
-         );                                                                           \
+    for (const char *var = obf_decrypt(                                              \
+                 var##__blob_,                                                        \
+                 (size_t)(sizeof(s) + 4u), var##__buf_);                             \
          var##__once_; var##__once_ = 0)
 
 /* ── OBF_INT ─────────────────────────────────────────────────────────
@@ -336,14 +335,16 @@
                        "OBF_STRING: string length exceeds OBF_MAX_LEN");      \
         char obf_sa_;                                                         \
     });                                                                       \
+    static const unsigned char var##__blob_[] = {                            \
+        OBF_SBOX(OBF_SEED0), OBF_SBOX(OBF_SEED1),                           \
+        OBF_SBOX(OBF_SEED2), OBF_SBOX(OBF_SEED3),                           \
+        OBF_ENC_ALL(s)                                                       \
+    };                                                                       \
     unsigned char var##__buf_[OBF_MAX_LEN] = {0};                            \
     unsigned char *var##__gc_                                                 \
         __attribute__((cleanup(obf_buf_cleanup_))) = var##__buf_;            \
-    const char *var = obf_decrypt(                                            \
-        (const unsigned char[]){OBF_SBOX(OBF_SEED0), OBF_SBOX(OBF_SEED1),   \
-                                 OBF_SBOX(OBF_SEED2), OBF_SBOX(OBF_SEED3),   \
-                                 OBF_ENC_ALL(s)},                             \
-        (size_t)(sizeof(s) + 4u), var##__buf_);                               \
+    const char *var = obf_decrypt(var##__blob_,                              \
+        (size_t)(sizeof(s) + 4u), var##__buf_);                              \
     (void)var##__gc_
 
 #else /* MSVC / unknown: no auto-zero; use OBF_WITH for safe cleanup */
@@ -354,11 +355,13 @@
                        "OBF_STRING: string length exceeds OBF_MAX_LEN");      \
         char obf_sa_;                                                         \
     });                                                                       \
+    static const unsigned char var##__blob_[] = {                            \
+        OBF_SBOX(OBF_SEED0), OBF_SBOX(OBF_SEED1),                           \
+        OBF_SBOX(OBF_SEED2), OBF_SBOX(OBF_SEED3),                           \
+        OBF_ENC_ALL(s)                                                       \
+    };                                                                       \
     unsigned char var##__buf_[OBF_MAX_LEN] = {0};                            \
-    const char *var = obf_decrypt(                                            \
-        (const unsigned char[]){OBF_SBOX(OBF_SEED0), OBF_SBOX(OBF_SEED1),   \
-                                 OBF_SBOX(OBF_SEED2), OBF_SBOX(OBF_SEED3),   \
-                                 OBF_ENC_ALL(s)},                             \
+    const char *var = obf_decrypt(var##__blob_,                              \
         (size_t)(sizeof(s) + 4u), var##__buf_)
 
 #endif /* __GNUC__ || __clang__ */

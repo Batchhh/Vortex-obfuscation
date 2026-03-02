@@ -46,15 +46,15 @@
  * We look at specific characters in the date string (like "Jan 01 2024").
  * We use prime numbers to multiply the characters so they combine randomly. */
 #define OBF_GSEED \
-    (( (unsigned int)OBF_FC(__DATE__, 0)*127u  \
-     + (unsigned int)OBF_FC(__DATE__, 1)*131u  \
-     + (unsigned int)OBF_FC(__DATE__, 2)*137u  \
-     + (unsigned int)OBF_FC(__DATE__, 4)*139u  \
-     + (unsigned int)OBF_FC(__DATE__, 5)*149u  \
-     + (unsigned int)OBF_FC(__DATE__, 7)*151u  \
-     + (unsigned int)OBF_FC(__DATE__, 8)*157u  \
-     + (unsigned int)OBF_FC(__DATE__, 9)*163u  \
-     + (unsigned int)OBF_FC(__DATE__,10)*167u  \
+    ((( (unsigned int)OBF_FC(__DATE__, 0)*127u  \
+      + (unsigned int)OBF_FC(__DATE__, 1)*131u  \
+      + (unsigned int)OBF_FC(__DATE__, 2)*137u  \
+      + (unsigned int)OBF_FC(__DATE__, 4)*139u  \
+      + (unsigned int)OBF_FC(__DATE__, 5)*149u  \
+      + (unsigned int)OBF_FC(__DATE__, 7)*151u  \
+      + (unsigned int)OBF_FC(__DATE__, 8)*157u  \
+      + (unsigned int)OBF_FC(__DATE__, 9)*163u  \
+      + (unsigned int)OBF_FC(__DATE__,10)*167u) \
      ^ ((unsigned int)(OBF_PROJECT_SALT) * 241u) \
     ) & 0xFFFFFFFFu)
 
